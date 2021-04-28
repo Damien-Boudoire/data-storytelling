@@ -6,8 +6,10 @@ import plotly.graph_objs as go
 from textwrap import dedent
 import numpy as np
 from app import app
+from utils import world_dataset_aggregation
 
 df = pd.read_csv("datasets/data_transformed.csv")
+df = pd.concat((df, world_dataset_aggregation.generate(df)))
 all_location = df.location.dropna().unique()
 
 layout = html.Div([
@@ -21,11 +23,9 @@ layout = html.Div([
         id='country-dropdown',
         options=[{'label': i, 'value': i} for i in all_location],
         multi=True,
-        value=['Afghanistan']
+        value=['Global']
     ),
-
     dcc.Graph(id='timeseries-graph')
-
 ])
 
 @app.callback(
