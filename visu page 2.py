@@ -5,9 +5,11 @@ from plotly.offline import  iplot
 import json
 colors = json.load(open("data/crayola.json"))["data"]
 
-df = pd.read_csv("./data/data_transformed.csv")
+df = pd.read_csv("data/data_transformed.csv")
 df = df.set_index('date')
 df = df.dropna()
+test = 0
+
 
 df_countries = []
 for p in np.unique(df.iso_code):
