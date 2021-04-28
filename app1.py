@@ -8,7 +8,7 @@ import numpy as np
 
 # Gapminder dataset GAPMINDER.ORG, CC-BY LICENSE
 #url = "https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv"
-df = pd.read_csv("data_transformed.csv") #pd.read_csv(url)
+df = pd.read_csv("data/data_transformed.csv") #pd.read_csv(url)
 # df = df.rename(index=str, columns={"pop": "population",
 #                                    "lifeExp": "life_expectancy",
 #                                    "gdpPercap": "GDP_per_capita"})
