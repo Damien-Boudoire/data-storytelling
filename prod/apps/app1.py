@@ -111,7 +111,6 @@ def update_graph(country_values, fields):
                                     )
                                 )
 
-        print(plotAxis1)
         graph = make_subplots(specs=[[{"secondary_y": True}]])
         for plot in plotAxis1:
             graph.add_trace(plot, secondary_y=False)
