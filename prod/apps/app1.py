@@ -18,9 +18,14 @@ all_location = df.location.dropna().unique()
 
 last_date = df['date'].max()
 
-mapData = df[df['date']==last_date][['iso_code', 'location', 'total_cases', 'total_deaths']]
-mapData.set_index('iso_code')
-mapData.drop(mapData[mapData['iso_code']=='WORLD'].index)
+mapData = df[df['date']==last_date][['iso_code', 'location', 'total_cases', 'total_deaths', 'stringency_index']]
+mapData.set_index('iso_code', inplace=True, drop=True)
+#world = mapData[mapData['iso_code']=='WORLD']
+#print(world.index)
+mapData.drop('WORLD', inplace=True)
+print(mapData.describe())
+
+print(mapData.describe())
 
 columns_names = {'total_cases': 'Cases' ,
                  'total_deaths': 'Deaths',
@@ -46,9 +51,17 @@ layout = html.Div([
             {'label': 'Total Cases', 'value': 'total_cases'},
             {'label': 'Total Deaths', 'value': 'total_deaths'},
             {'label': 'Stringency', 'value': 'stringency_index'}
-            ],
-        value=["total_cases"])  ,
+        ],
+        value=["total_cases"]),
     dcc.Graph(id='timeseries-graph'),
+    dcc.RadioItems(
+        id='map-field',
+        options=[
+            {'label': 'Total Cases', 'value': 'total_cases'},
+            {'label': 'Total Deaths', 'value': 'total_deaths'},
+            {'label': 'Stringency', 'value': 'stringency_index'}
+        ],
+        value='total_cases'),
     dcc.Graph(id='world-map')
 
 ])
@@ -57,8 +70,9 @@ layout = html.Div([
     dash.dependencies.Output('timeseries-graph', 'figure'),
     dash.dependencies.Output('world-map','figure'),
     [dash.dependencies.Input('country-dropdown', 'value'),
-     dash.dependencies.Input('input-fields', 'value')])
-def update_graph(country_values, fields):
+     dash.dependencies.Input('input-fields', 'value'),
+     dash.dependencies.Input('map-field', 'value')])
+def update_graph(country_values, fields, map_field):
     dff = df.loc[df['location'].isin(country_values)]
     locations = dff.location.unique()
     plotAxis1 = []
@@ -131,11 +145,14 @@ def update_graph(country_values, fields):
 
     worldMap = {
         'data': [go.Choropleth(
-            locations=['iso_code'],
-            z=mapData['total_cases'],
+            locations=mapData.index,
+            z=mapData[map_field],
             colorscale="Reds",
             text=mapData['location'])],
-        'layout': go.Layout()
+        'layout': go.Layout(
+                title = "State of the World on {0}".format(last_date),
+                margin=dict(l=60, r=60, t=50, b=50, autoexpand=True)
+            )
             }
 
     return graph, worldMap
