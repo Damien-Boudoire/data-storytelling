@@ -10,20 +10,32 @@ from app import app
 from utils import world_dataset_aggregation
 from utils import load_dataset
 
-
 df = load_dataset.load_covid()
 df = pd.concat((df, world_dataset_aggregation.generate(df)))
 all_location = df.location.dropna().unique()
 
+load_dataset.save_cases_and_deaths_on_pop(df)
+label_cases='cases_pop'    #'total_cases'
+label_deaths='deaths_pop'   #'total_deaths'
 
 last_date = df['date'].max()
 
-mapData = df[df['date']==last_date][['iso_code', 'location', 'total_cases', 'total_deaths', 'stringency_index']]
+
+countries = df['iso_code'].unique()
+print(countries)
+
+all_countries = []
+for iso in countries:
+    country_stat = df[df['iso_code']==iso]
+    last_country_date = country_stat['date'].max()
+    all_countries.append(country_stat[country_stat['date']==last_country_date][['iso_code', 'location', label_cases, label_deaths, 'stringency_index']])
+
+mapData = pd.concat(all_countries)
 mapData.set_index('iso_code', inplace=True, drop=True)
 mapData.drop('WORLD', inplace=True)
 
-columns_names = {'total_cases': 'Cases' ,
-                 'total_deaths': 'Deaths',
+columns_names = {label_cases: 'Cases' ,
+                 label_deaths: 'Deaths',
                  'stringency_index': 'Stringency'}
 
 
@@ -43,20 +55,20 @@ layout = html.Div([
     dcc.Checklist(
         id="input-fields",
         options=[
-            {'label': 'Total Cases', 'value': 'total_cases'},
-            {'label': 'Total Deaths', 'value': 'total_deaths'},
+            {'label': columns_names[label_cases], 'value': label_cases},
+            {'label': columns_names[label_deaths], 'value': label_deaths},
             {'label': 'Stringency', 'value': 'stringency_index'}
         ],
-        value=["total_cases"]),
+        value=[label_cases]),
     dcc.Graph(id='timeseries-graph'),
     dcc.RadioItems(
         id='map-field',
         options=[
-            {'label': 'Total Cases', 'value': 'total_cases'},
-            {'label': 'Total Deaths', 'value': 'total_deaths'},
+            {'label': 'Total Cases', 'value': label_cases},
+            {'label': 'Total Deaths', 'value': label_deaths},
             {'label': 'Stringency', 'value': 'stringency_index'}
         ],
-        value='total_cases'),
+        value=label_cases),
     dcc.Graph(id='world-map')
 
 ])
@@ -73,14 +85,14 @@ def update_graph(country_values, fields, map_field):
     plotAxis1 = []
     plotAxis2 = []
     for loc in locations:
-        if 'total_cases' in fields:
+        if label_cases in fields:
             for location in country_values:
                 plotAxis1.append(go.Scatter(
                                     x=dff[dff['location'] == location]['date'],
-                                    y=dff[dff['location'] == location]['total_cases'],
+                                    y=dff[dff['location'] == location][label_cases],
                                     text="location ",
                                     mode='lines',
-                                    name=location+"-"+columns_names['total_cases'],
+                                    name=location+"-"+columns_names[label_cases],
                                     marker={
                                         'size': 15,
                                         'opacity': 0.5,
@@ -88,14 +100,14 @@ def update_graph(country_values, fields, map_field):
                                         }
                                     )
                                 )
-        if 'total_deaths' in fields:
+        if label_deaths in fields:
             for location in country_values:
                 plotAxis1.append(go.Scatter(
                                     x=dff[dff['location'] == location]['date'],
-                                    y=dff[dff['location'] == location]['total_deaths'],
+                                    y=dff[dff['location'] == location][label_deaths],
                                     text="location ",
                                     mode='lines',
-                                    name=location+"-"+columns_names['total_deaths'],
+                                    name=location+"-"+columns_names[label_deaths],
                                     marker={
                                         'size': 15,
                                         'opacity': 0.5,

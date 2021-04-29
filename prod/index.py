@@ -14,13 +14,13 @@ from app import app
 from app import server
 
 # Connect to your app pages
-from apps import app1
-
+from apps import app1, app2
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div([
-        dcc.Link("Page d'acceuil", href='/apps/app1'),
+        dcc.Link("Page d'accueil", href='/apps/app1'),
+        dcc.Link("Page d'accueil", href='/apps/app2'),
     ], className="row"),
     html.Div(id='page-content', children=[])
 ])
@@ -31,6 +31,8 @@ app.layout = html.Div([
 def display_page(pathname):
     if pathname == '/apps/app1':
         return app1.layout
+    elif pathname == '/apps/app2':
+        return app2.layout
     else:
         return "Welcome! Please choose a link"
 
