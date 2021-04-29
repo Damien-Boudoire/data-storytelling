@@ -14,6 +14,10 @@ df = load_dataset.load_covid()
 df = pd.concat((df, world_dataset_aggregation.generate(df)))
 all_location = df.location.dropna().unique()
 
+columns_names = {'total_cases': 'Cases' ,
+                 'total_deaths': 'Deaths',
+                 'stringency_index': 'Stringency'}
+
 layout = html.Div([
     html.H1('Dash App Basics',
     ),
@@ -27,29 +31,46 @@ layout = html.Div([
         multi=True,
         value=['Global']
     ),
+    dcc.Checklist(
+        id="input-fields",
+        options=[
+            {'label': 'Total Cases', 'value': 'total_cases'},
+            {'label': 'Total Deaths', 'value': 'total_deaths'},
+            {'label': 'Stringency', 'value': 'stringency_index'}
+            ],
+        value=["total_cases"])  ,
     dcc.Graph(id='timeseries-graph')
 ])
 
 @app.callback(
     dash.dependencies.Output('timeseries-graph', 'figure'),
-    [dash.dependencies.Input('country-dropdown', 'value')])
-def update_graph(country_values):
+    [dash.dependencies.Input('country-dropdown', 'value'),
+     dash.dependencies.Input('input-fields', 'value')])
+def update_graph(country_values, fields):
+    print(country_values)
     dff = df.loc[df['location'].isin(country_values)]
+    locations = dff.location.unique()
+    toPlot = []
+    for loc in locations:
+        for col in fields:
+            toPlot.append((loc,col))
     return {
         'data': [go.Scatter(
             x=dff[dff['location'] == location]['date'],
-            y=dff[dff['location'] == location]['stringency_index'],
+            y=dff[dff['location'] == location][column],
             text="location ",
             mode='lines',
-            name=location,
+            name=location+"-"+columns_names[column],
             marker={
                 'size': 15,
                 'opacity': 0.5,
                 'line': {'width': 0.5, 'color': 'white'}
             }
-        ) for location in dff.location.unique()],
+        ) for location, column in toPlot],
         'layout': go.Layout(
-            title="STI over time, by country",
+            title="{0} over time, in {1}".format(", ".join([columns_names[col]
+                                                            for col in fields]),
+                                                    ", ".join(locations)),
             xaxis={'title': 'date'},
             yaxis={'title': 'stringency_index'},
             margin={'l': 60, 'b': 50, 't': 80, 'r': 0},
