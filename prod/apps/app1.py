@@ -7,8 +7,10 @@ from textwrap import dedent
 import numpy as np
 from app import app
 from utils import world_dataset_aggregation
+from utils import load_dataset
 
-df = pd.read_csv("datasets/data_transformed.csv")
+
+df = load_dataset.load_covid()
 df = pd.concat((df, world_dataset_aggregation.generate(df)))
 all_location = df.location.dropna().unique()
 
