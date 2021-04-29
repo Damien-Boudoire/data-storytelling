@@ -20,12 +20,7 @@ last_date = df['date'].max()
 
 mapData = df[df['date']==last_date][['iso_code', 'location', 'total_cases', 'total_deaths', 'stringency_index']]
 mapData.set_index('iso_code', inplace=True, drop=True)
-#world = mapData[mapData['iso_code']=='WORLD']
-#print(world.index)
 mapData.drop('WORLD', inplace=True)
-print(mapData.describe())
-
-print(mapData.describe())
 
 columns_names = {'total_cases': 'Cases' ,
                  'total_deaths': 'Deaths',
