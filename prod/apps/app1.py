@@ -15,14 +15,13 @@ df = pd.concat((df, world_dataset_aggregation.generate(df)))
 all_location = df.location.dropna().unique()
 
 load_dataset.save_cases_and_deaths_on_pop(df)
-label_cases='cases_pop'    #'total_cases'
-label_deaths='deaths_pop'   #'total_deaths'
+label_cases='cases_pop'
+label_deaths='deaths_pop'
 
 last_date = df['date'].max()
 
 
 countries = df['iso_code'].unique()
-print(countries)
 
 all_countries = []
 for iso in countries:
@@ -64,8 +63,8 @@ layout = html.Div([
     dcc.RadioItems(
         id='map-field',
         options=[
-            {'label': 'Total Cases', 'value': label_cases},
-            {'label': 'Total Deaths', 'value': label_deaths},
+            {'label': columns_names[label_cases], 'value': label_cases},
+            {'label': columns_names[label_deaths], 'value': label_deaths},
             {'label': 'Stringency', 'value': 'stringency_index'}
         ],
         value=label_cases),
