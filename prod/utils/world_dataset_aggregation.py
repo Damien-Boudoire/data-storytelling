@@ -14,12 +14,12 @@ def generate(df):
     for p in np.unique(df.location):
         pop_ratio[p] = round(df[df['location'] == p]['population'].mean()/pop_totale, 4)
 
-    df_concat_sti = df_countries[0].stringency_index
+    df_concat_sti = df_countries[0].stringency_index * pop_ratio[df_countries[0].location[0]]
     df_concat_tc = df_countries[0].total_cases
     df_concat_td = df_countries[0].total_deaths
     for i in range(1, len(df_countries)):
         country = df_countries[i].location[0]
-        df_concat_sti = pd.concat([df_concat_sti, df_countries[i].stringency_index], axis=1) * pop_ratio[country]
+        df_concat_sti = pd.concat([df_concat_sti, df_countries[i].stringency_index * pop_ratio[country]], axis=1)
         df_concat_tc = pd.concat([df_concat_tc, df_countries[i].total_cases], axis=1)
         df_concat_td = pd.concat([df_concat_td, df_countries[i].total_deaths], axis=1)
 
