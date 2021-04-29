@@ -15,38 +15,80 @@ df = df.rename(index=str, columns={"location": "Country", "total_cases": "Total_
                                    "stringency_index": "Stringency_index", "population": "Pop"})
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets = external_stylesheets)
+app = dash.Dash(__name__, external_stylesheets =[dbc.themes.DARKLY])
 
 all_location = df.Country.dropna().unique()
 
+# app.layout = html.Div([
+#     html.H1('Influence of restrictions on total deaths and cases of Covid-19', style={'text-align': 'center'}),
+#
+#     html.H5("Select at least two countries":),
+#
+#     dcc.Dropdown(
+#         id='country-dropdown',
+#         options=[{'label': i, 'value': i} for i in all_location],
+#         multi=True,
+#         value=['Afghanistan', "France"],
+#         clearable = False
+#     ),
+#
+#     html.Div([
+#         dcc.Graph(id='timeseries-graph', figure={},
+#                   config={
+#                       'staticPlot': False,  # True, False
+#                       'scrollZoom': True,  # True, False
+#                       'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
+#                       'showTips': True,  # True, False
+#                       'displayModeBar': True,  # True, False, 'hover'
+#                       'watermark': True,
+#                   }, className = "row"),
+#         html.Div([
+#             dcc.Graph(id="pie-graph", figure={}, className = "six columns"),
+#             dcc.Graph(id="pie-graph1", figure={}, className = "six columns")
+#         ], className = "row"),
+#         ])
+# ])
+
 app.layout = html.Div([
-    html.H1('Influence of restrictions on total deaths and cases of Covid-19'),
-
-    dcc.Markdown("Select two countries"),
-
-    dcc.Dropdown(
-        id='country-dropdown',
-        options=[{'label': i, 'value': i} for i in all_location],
-        multi=True,
-        value=['Afghanistan', "France"],
-        clearable = False
-    ),
-
-    html.Div([
-        dcc.Graph(id='timeseries-graph', figure={},
-                  config={
-                      'staticPlot': False,  # True, False
-                      'scrollZoom': True,  # True, False
-                      'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
-                      'showTips': True,  # True, False
-                      'displayModeBar': True,  # True, False, 'hover'
-                      'watermark': True,
-                  }, className = "row"),
-        html.Div([
-            dcc.Graph(id="pie-graph", figure={}, className = "six columns"),
-            dcc.Graph(id="pie-graph1", figure={}, className = "six columns")
-        ], className = "row"),
-        ])
+        dbc.Row(dbc.Col(html.H1('Influence of restrictions on total deaths and cases of Covid-19', style={'text-align': 'center'}),
+                        ),
+                ),
+        dbc.Row(dbc.Col(html.H5("Select at least two countries:"),
+                        ),
+                ),
+        dbc.Row(dbc.Col(dcc.Dropdown(
+            id='country-dropdown',
+            options=[{'label': i, 'value': i} for i in all_location],
+            multi=True,
+            value=['Afghanistan', "France"],
+            clearable = False
+                                   ),
+                        width={'size': 4, 'offset': 0},
+                        ),
+                ),
+        dbc.Row(dbc.Col(dcc.Graph(id='timeseries-graph', figure={},
+                   config={
+                       'staticPlot': False,  # True, False
+                       'scrollZoom': True,  # True, False
+                       'doubleClick': 'reset',  # 'reset', 'autosize' or 'reset+autosize', False
+                       'showTips': True,  # True, False
+                       'displayModeBar': True,  # True, False, 'hover'
+                       'watermark': True,
+                   }
+                                ),
+            width={'size': 6, 'offset': 3},
+                        ),
+                ),
+        dbc.Row(
+            [
+                dbc.Col(dcc.Graph(id="pie-graph", figure={}),
+                        width=8, lg={'size': 3,  "offset": 2, 'order': 'first'}
+                        ),
+                dbc.Col(dcc.Graph(id="pie-graph1", figure={}),
+                        width=4, lg={'size': 3,  "offset": 2, 'order': 'last'}
+                        ),
+            ]
+                )
 ])
 
 @app.callback(
