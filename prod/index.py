@@ -19,8 +19,8 @@ from apps import app1, app2
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div([
-        dcc.Link("Page d'accueil", href='/apps/app1'),
-        dcc.Link("Page d'accueil", href='/apps/app2'),
+        dcc.Link("page 1", href='/apps/app1'),
+        dcc.Link("page 2", href='/apps/app2'),
     ], className="row"),
     html.Div(id='page-content', children=[])
 ])
@@ -38,4 +38,4 @@ def display_page(pathname):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)

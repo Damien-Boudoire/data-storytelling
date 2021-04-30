@@ -59,7 +59,7 @@ layout = html.Div([
             {'label': 'Stringency', 'value': 'stringency_index'}
         ],
         value=[label_cases]),
-    dcc.Graph(id='timeseries-graph'),
+    dcc.Graph(id='pandemic-stats-graph'),
     dcc.RadioItems(
         id='map-field',
         options=[
@@ -73,7 +73,7 @@ layout = html.Div([
 ])
 
 @app.callback(
-    dash.dependencies.Output('timeseries-graph', 'figure'),
+    dash.dependencies.Output('pandemic-stats-graph', 'figure'),
     dash.dependencies.Output('world-map','figure'),
     [dash.dependencies.Input('country-dropdown', 'value'),
      dash.dependencies.Input('input-fields', 'value'),
