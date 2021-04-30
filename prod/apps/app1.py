@@ -39,10 +39,7 @@ columns_names = {label_cases: 'Cases' ,
 
 
 layout = html.Div([
-    html.H1('Dash App Basics',
-    ),
-
-    dcc.Markdown("Message à afficher"
+    html.H2('Page Title',
     ),
 
     dcc.Dropdown(
