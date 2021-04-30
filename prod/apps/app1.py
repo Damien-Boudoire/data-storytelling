@@ -70,6 +70,20 @@ layout = html.Div([
 ])
 
 @app.callback(
+        dash.dependencies.Output('country-dropdown', 'value'),
+        dash.dependencies.Output('world-map', 'clickData'),
+        dash.dependencies.Input('world-map', 'clickData'),
+        dash.dependencies.Input('country-dropdown', 'value'))
+def select_country(click, countries):
+    if click is None:
+        return countries, None
+    print(click)
+    clicked = click['points'][0]['text']
+    print(clicked)
+    countries.append(clicked)
+    return countries, None
+
+@app.callback(
     dash.dependencies.Output('pandemic-stats-graph', 'figure'),
     dash.dependencies.Output('world-map','figure'),
     [dash.dependencies.Input('country-dropdown', 'value'),
