@@ -2,11 +2,13 @@ import pandas as pd
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 from textwrap import dedent
 import numpy as np
 from app import app
+from dash.dependencies import Output, Input
 from utils import world_dataset_aggregation
 from utils import load_dataset
 
@@ -39,56 +41,74 @@ columns_names = {label_cases: 'Cases' ,
 
 
 layout = html.Div([
-    html.H2('Page Title',
-    ),
+    dbc.Row( html.H2('Page Title')),
 
-    dcc.Dropdown(
-        id='country-dropdown',
-        options=[{'label': i, 'value': i} for i in all_location],
-        multi=True,
-        value=['Global']
-    ),
-    dcc.Checklist(
-        id="input-fields",
-        options=[
-            {'label': columns_names[label_cases], 'value': label_cases},
-            {'label': columns_names[label_deaths], 'value': label_deaths},
-            {'label': 'Stringency', 'value': 'stringency_index'}
-        ],
-        value=[label_cases]),
-    dcc.Graph(id='pandemic-stats-graph'),
-    dcc.RadioItems(
-        id='map-field',
-        options=[
-            {'label': columns_names[label_cases], 'value': label_cases},
-            {'label': columns_names[label_deaths], 'value': label_deaths},
-            {'label': 'Stringency', 'value': 'stringency_index'}
-        ],
-        value=label_cases),
-    dcc.Graph(id='world-map')
+    dbc.Row(
+        dbc.Col(
+            dcc.Dropdown(
+            id='select-country',
+            options=[{'label': i, 'value': i} for i in all_location],
+            multi=True,
+            value=['Global']
+        ),
+        width=12    )),
+    dbc.Row([
+        dbc.Col(
+            dcc.Checklist(
+            id="input-fields",
+            options=[
+                {'label': columns_names[label_cases], 'value': label_cases},
+                {'label': columns_names[label_deaths], 'value': label_deaths},
+                {'label': 'Stringency', 'value': 'stringency_index'}
+            ],
+            value=[label_cases]),
+            width = 1
+            ),
+
+            dbc.Col(
+                dcc.Graph(id='pandemic-stats-graph'),
+                width=11)
+        ], id="row_graph1"),
+    dbc.Row([
+        dbc.Col(
+            dcc.RadioItems(
+                id='map-field',
+                options=[
+                    {'label': columns_names[label_cases], 'value': label_cases},
+                    {'label': columns_names[label_deaths], 'value': label_deaths},
+                    {'label': 'Stringency', 'value': 'stringency_index'}
+                ],
+                value=label_cases),
+            width = 1
+        ),
+        dbc.Col(
+            dcc.Graph(id='world-map'),
+            width = 11
+        )
+    ], id="row_map1")
 
 ])
 
 @app.callback(
-        dash.dependencies.Output('country-dropdown', 'value'),
-        dash.dependencies.Output('world-map', 'clickData'),
-        dash.dependencies.Input('world-map', 'clickData'),
-        dash.dependencies.Input('country-dropdown', 'value'))
+        Output('select-country', 'value'),
+        Output('world-map', 'clickData'),
+        Input('world-map', 'clickData'),
+        Input('select-country', 'value'))
 def select_country(click, countries):
     if click is None:
         return countries, None
-    print(click)
+    #print(click)
     clicked = click['points'][0]['text']
-    print(clicked)
+    #print(clicked)
     countries.append(clicked)
     return countries, None
 
 @app.callback(
-    dash.dependencies.Output('pandemic-stats-graph', 'figure'),
-    dash.dependencies.Output('world-map','figure'),
-    [dash.dependencies.Input('country-dropdown', 'value'),
-     dash.dependencies.Input('input-fields', 'value'),
-     dash.dependencies.Input('map-field', 'value')])
+    Output('pandemic-stats-graph', 'figure'),
+    Output('world-map','figure'),
+    [Input('select-country', 'value'),
+     Input('input-fields', 'value'),
+     Input('map-field', 'value')])
 def update_graph(country_values, fields, map_field):
     dff = df.loc[df['location'].isin(country_values)]
     locations = dff.location.unique()
@@ -153,7 +173,7 @@ def update_graph(country_values, fields, map_field):
                                                             for col in fields]),
                                                     ", ".join(locations)),
             xaxis={'title': 'date'},
-            yaxis={'title': 'cases & deaths'},
+            yaxis={'title': 'cases & deaths in % of the population'},
             yaxis2={'title': 'stringency index'},
             margin={'l': 60, 'b': 50, 't': 80, 'r': 0},
             hovermode='closest'

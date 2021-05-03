@@ -1,0 +1,28 @@
+h1{
+	color: white;
+}
+
+#navigation{
+	padding: 2%;
+}
+
+#page-content{
+	background-color: white;
+	padding: 2%;
+}
+
+.button.button-primary{
+	margin: 5px;
+}
+
+#row_graph1{
+	margin: 2%;
+}
+
+#row_map1{
+	margin: 2%;
+}
+
+#input-fields{
+	margin-top:20%;
+}

@@ -20,17 +20,25 @@ import home
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
-    html.Div([
-        dbc.Nav([
-            dbc.NavLink("Home", href='/home'),
-            dbc.NavLink("Page 1", href='/apps/app1'),
-            dbc.NavLink("Page 2", href='/apps/app2'),
-        ]),
-        html.H1("Main Title")
+    dbc.Row([
+        dbc.Col(
+            html.Div(
+                dbc.Nav([
+                    dbc.NavLink("Home", href='/home', className='button button-primary'),
+                    dbc.NavLink("Page 1", href='/apps/app1', className='button button-primary'),
+                    dbc.NavLink("Page 2", href='/apps/app2', className='button button-primary'),
+                ])),
+                width = 4
+            ),
+        dbc.Col(html.Div(), width = 4),
+        dbc.Col(
+            html.H1("Main Title"),
+            width = 4
+        )
     ]),
 
     html.Div(id='page-content')
-])
+], id="navigation")
 
 
 @app.callback(Output('page-content', 'children'),
